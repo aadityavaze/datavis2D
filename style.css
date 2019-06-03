@@ -1,0 +1,160 @@
+body {
+  text-align: center;
+  font-family: "Roboto Condensed", Sans-serif;
+  margin: 0;
+}
+
+.graph-data {
+  position: absolute;
+  top: 0px;
+  padding: 5px;
+  z-index: 1000;
+  right: 0;
+}
+
+.toggle-data-btn {
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.toggle-data-btn:hover {
+  opacity: 1;
+}
+
+#graph-data-description {
+  font-size: 12px;
+  color: slategrey;
+}
+
+.textValue {
+  color: #fff;
+  font-size: 12px;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: sans-serif;
+}
+
+.range-slider {
+  margin: 0px 0px 0px 0px;
+}
+
+.range-slider {
+  width: 240px;
+}
+#errorValue {
+  position: absolute;
+  right: 10px;
+  margin-top: 40px;
+}
+
+#computationTimeValue {
+  position: absolute;
+  right: 10px;
+  margin-top: 60px;
+}
+
+#iterationCountValue {
+  position: absolute;
+  right: 10px;
+  margin-top: 80px;
+}
+.range-slider__range {
+  -webkit-appearance: none;
+  width: calc(100% - (73px));
+  height: 8px;
+  border-radius: 5px;
+  background: #d7dcdf;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+.range-slider__range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #2c3e50;
+  cursor: pointer;
+  transition: background 0.15s ease-in-out;
+}
+.range-slider__range::-webkit-slider-thumb:hover {
+  background: #1abc9c;
+}
+.range-slider__range:active::-webkit-slider-thumb {
+  background: #1abc9c;
+}
+.range-slider__range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: #2c3e50;
+  cursor: pointer;
+  transition: background 0.15s ease-in-out;
+}
+.range-slider__range::-moz-range-thumb:hover {
+  background: #1abc9c;
+}
+.range-slider__range:active::-moz-range-thumb {
+  background: #1abc9c;
+}
+.range-slider__range:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 6px #1abc9c;
+}
+
+button {
+  background: #2c3e50;
+  color: white;
+  border-radius: 6px;
+  font-family: "Roboto Condensed";
+  letter-spacing: 1px;
+  margin-top: 20px;
+  border: none;
+  padding: 8px 12px;
+  margin-left: 0;
+  position: absolute;
+  right: 10px;
+  cursor: pointer;
+}
+
+.range-slider__value {
+  display: inline-block;
+  position: relative;
+  width: 60px;
+  color: #fff;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 3px;
+  background: #2c3e50;
+  padding: 5px 10px;
+  margin-left: 8px;
+}
+.range-slider__value:after {
+  position: absolute;
+  top: 8px;
+  left: -7px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-right: 7px solid #2c3e50;
+  border-bottom: 7px solid transparent;
+  content: "";
+}
+
+::-moz-range-track {
+  background: #d7dcdf;
+  border: 0;
+}
+
+input::-moz-focus-inner,
+input::-moz-focus-outer {
+  border: 0;
+}

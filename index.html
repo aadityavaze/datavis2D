@@ -1,0 +1,60 @@
+<html>
+
+<head>
+  <title>Ego-centric data Visualization</title>
+  <script src="//unpkg.com/3d-force-graph-vr"></script>
+  <script src="//unpkg.com/d3-force-magnetic"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/qwest/4.4.5/qwest.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.4/papaparse.min.js"></script>
+  <script src="//unpkg.com/three-spritetext"></script>
+  <script src="jquery-3.3.1.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet" />
+</head>
+
+<body>
+  <div id="sphere"></div>
+
+  <div id="contain" class="graph-data">
+    <div class="range-slider">
+      <input id="linkStrengthValue" class="range-slider__range" type="range" value="100" min="0" max="100" />
+      <span class="range-slider__value">50</span>
+      <span class="textValue">Node Link Strength</span>
+    </div>
+    <div class="range-slider">
+      <input id="radialForceStrengthValue" class="range-slider__range" type="range" value="0" min="0" max="100" />
+      <span class="range-slider__value">50</span>
+      <span class="textValue">Radial Force Strength</span>
+    </div>
+    <div class="range-slider">
+      <input id="sphericalClusteringStrengthValue" class="range-slider__range" type="range" value="0" min="0"
+        max="100" />
+      <span class="range-slider__value">50</span>
+      <span class="textValue">Spherical Clustering Strength</span>
+    </div>
+    <div class="range-slider">
+      <input id="sphericalClusteringRadiusValue" class="range-slider__range" type="range" value="300" min="200"
+        max="500" />
+      <span class="range-slider__value">50</span>
+      <span class="textValue">Spherical Clustering Radius</span>
+    </div>
+    <button id="startForce" onclick="initializeGraph()">
+      Restart Simulation
+    </button>
+    <br />
+    <span id="errorValue" class="textValue">Calculating Error..</span>
+    <span id="computationTimeValue" class="textValue">Computing Time..</span>
+    <span id="iterationCountValue" class="textValue">Iterations: 0</span>
+    <span id="graph-data-description"></span>
+  </div>
+  <div id="3d-graph"></div>
+
+  <script src="index.js"></script>
+  <script src="rangeSlider.js"></script>
+  <div class="result-data">
+    <!--  <button class="button">Button</button> -->
+  </div>
+</body>
+
+</html>
