@@ -1,3 +1,3 @@
-# aadityavaze.github.io
+# Ego Centric Visualization 
 
-VR Data Visualization Tool
+Improving the visibility of nodes in a dataset by establishing radial repulsion forces.
