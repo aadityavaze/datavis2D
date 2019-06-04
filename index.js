@@ -5485,7 +5485,8 @@ var data = {
     { id: "236", name: "Mayotte" },
     { id: "237", name: "South Africa" },
     { id: "238", name: "Zambia" },
-    { id: "239", name: "Zimbabwe" }
+    { id: "239", name: "Zimbabwe" },
+    { id: "240xs", name: "Viewer" }
   ],
   links: [
     { source: "0", target: "1", distance: "253.27012292239587" },
@@ -34167,7 +34168,7 @@ var data = {
     { source: "236", target: "239", distance: "89.83117706898646" },
     { source: "237", target: "238", distance: "83.1918561365134" },
     { source: "237", target: "239", distance: "58.27777714311592" },
-    { source: "238", target: "239", distance: "27.660054445626418" }
+    { source: "238", target: "239", distance: "27.660054445626418"}
   ]
 };
 
@@ -34204,14 +34205,18 @@ var mydata = {
 
 var adata = {
   nodes: [
+    { id: "0", name: "0" },
     { id: "1", name: "1" },
     { id: "2", name: "2" },
     { id: "3", name: "3" },
     { id: "4", name: "4" },
-    { id: "5", name: "5" }
+    { id: "5", name: "5" },
+    { id: "6", name: "6" },
+    { id: "7", name: "Viewer" }
   ],
 
   links: [
+    { source: "0", target: "1", distance: "20" },
     { source: "1", target: "2", distance: "10" },
     { source: "1", target: "3", distance: "20" },
     { source: "1", target: "4", distance: "30" },
@@ -34221,48 +34226,16 @@ var adata = {
     { source: "2", target: "5", distance: "30" },
     { source: "3", target: "4", distance: "30" },
     { source: "3", target: "5", distance: "40" },
-    { source: "4", target: "5", distance: "10" }
+    { source: "4", target: "5", distance: "10" },
+    { source: "4", target: "6", distance: "20" },
+    { source: "2", target: "6", distance: "70" }
   ]
 };
 
-//listen for camera change/ user movement
-var toggleChange = 0;
-document.addEventListener("keydown", function(event) {
-  if (
-    event.keyCode == "37" ||
-    event.keyCode == "38" ||
-    event.keyCode == "39" ||
-    event.keyCode == "40"
-  ) {
-    console.log("key down");
-    if (toggleChange == 0) {
-      toggleChange = 1;
-    }
-  }
-});
-document.addEventListener("keyup", function(event) {
-  if (
-    event.keyCode == "37" ||
-    event.keyCode == "38" ||
-    event.keyCode == "39" ||
-    event.keyCode == "40"
-  ) {
-    console.log("key up");
-    if (toggleChange == 1) {
-      toggleChange = 0;
-    }
-
-    if (toggleChange == 0) {
-      console.log("change layout");
-      initializeGraph();
-      //.d3AlphaDecay(0.3)
-    }
-  }
-});
 
 //First-time Initializing graph
 
-linkStrengtSliderValue =
+linkStrengthSliderValue =
   document.getElementById("linkStrengthValue").value / 100;
 radialRepulsionSliderValue =
   document.getElementById("radialForceStrengthValue").value / 100;
@@ -34275,22 +34248,17 @@ tickCount = 0;
 
 startComputationTime = new Date().getTime();
 
-const Graph = ForceGraphVR()(document.getElementById("3d-graph"))
-  .graphData(data)
+const Graph = ForceGraph3D()(document.getElementById("3d-graph"))
+  .graphData(adata)
   .d3Force("charge", null)
   //.d3Force("Linear_Spring_force", LinearSpringForce)
-  .d3Force(
-    "link",
-    d3
-      .forceLink()
-      .distance(d => d.distance)
-      .strength(linkStrengtSliderValue)
-  )
+  .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
   .d3Force("Radial_Replusion_force", RadialRepulsionForce)
-  .d3Force("Spherical_force", SphericalClusteringForce)
-  .d3Force("collision", d3.forceCollide(5).iterations(10))
-  .linkVisibility(false)
-  .onEngineTick(ticked);
+  //.d3Force("Spherical_force", SphericalClusteringForce)
+ // .d3Force("collision", d3.forceCollide(5).iterations(10))
+  //.linkVisibility(false)
+  .onEngineTick(ticked)
+  ;
 //.nodeLabel('name')
 //.linkLabel('distance')
 // .onEngineStop(computeDistances)
@@ -34301,55 +34269,13 @@ const sprite = new THREE.Sprite(material);
 sprite.scale.set(10, 10);
 return sprite;
 })*/
-let { nodesInitial, links } = Graph.graphData();
 
 //Method for Initializing graph later
-function initializeGraph() {
-  //Computation start-time
-  startComputationTime = new Date().getTime();
-
-  //Resetting Values
-  document.getElementById("errorValue").textContent = "Calculating error..";
-  document.getElementById("computationTimeValue").textContent =
-    "Computing time..";
-  document.getElementById("iterationCountValue").textContent = "Iterations:0";
-
-  //Fetching Slider Values
-  linkStrengtSliderValue =
-    document.getElementById("linkStrengthValue").value / 100;
-  radialRepulsionSliderValue =
-    document.getElementById("radialForceStrengthValue").value / 100;
-  sphericalClusteringRadiusValue = document.getElementById(
-    "sphericalClusteringRadiusValue"
-  ).value;
-  sphericalClusteringStrengthValue =
-    document.getElementById("sphericalClusteringStrengthValue").value / 100;
-  tickCount = 0;
-
-  nodesTemp = nodes;
-  //Start-main
-  Graph.graphData({nodes, links})
-    .d3Force(
-      "link",
-      d3
-        .forceLink()
-        .distance(d => d.distance)
-        .strength(0)
-    )
-    .d3Force("charge", null)
-    .d3Force("collision", d3.forceCollide(6).iterations(10))
-    .d3Force("Radial_Replusion_force", RadialRepulsionForce)
-    //.d3Force("Spherical_force", SphericalClusteringForce)
-    .linkVisibility(false)
-    .onEngineTick(ticked);
-}
 
 function ticked() {
   tickCount++;
   //console.log(tickCount);
-  if (tickCount == 280) {
-    computeDistances();
-  }
+   // computeDistances();
   document.getElementById("iterationCountValue").textContent =
     "Iterations: " + tickCount;
 }
@@ -34361,8 +34287,8 @@ function computeDistances() {
     "Eff.Comp.Time: " + (endComputationTime - startComputationTime) + " ms";
   var dist = [];
   var errorSum = 0;
-  for (var i = 0; i < nodes.length; i++) {
-    for (var j = i + 1; j < nodes.length; j++) {
+  for (var i = 0; i < nodes.length-1; i++) {
+    for (var j = i + 1; j < nodes.length-1; j++) {
       dist[j + i] = Math.sqrt(
         (nodes[i].x - nodes[j].x) * (nodes[i].x - nodes[j].x) +
           (nodes[i].y - nodes[j].y) * (nodes[i].y - nodes[j].y) +
@@ -34383,16 +34309,6 @@ function computeDistances() {
 }
 
 var worldPos;
-var tempWorldPos;
-
-//Get camera position
-var cameraEl = document.getElementsByTagName("a-entity")[0];
-
-worldPos = new THREE.Vector3();
-worldPos.setFromMatrixPosition(cameraEl.object3D.matrixWorld);
-
-tempWorldPos = worldPos;
-
 //Defining the Rdial Repulsion Force
 RadialRepulsionForce.initialize = function(_) {
   nodes = _;
@@ -34405,20 +34321,21 @@ function RadialRepulsionForce(alpha) {
 
       //Projecting onto x-y axis
 
-      worldPos.setFromMatrixPosition(cameraEl.object3D.matrixWorld);
+      //worldPos.setFromMatrixPosition(cameraEl.object3D.matrixWorld);
 
       //	console.log("user's position is" + worldPos.x);
 
       //nodes[0].fixed=true;//nodes[0].x=0;//nodes[0].y=0;
       //viewNode= nodes[nodes.length-1];
+      worldPos= nodes[nodes.length-1];
       var thetaArray = [];
 
       //Appending theta to thetaArray in radians (-pi,pi] corresponding to each node
-      for (var i = 0, n = nodes.length, node; i < n; i++) {
+      for (var i = 0, n = nodes.length-1, node; i < n; i++) {
         node = nodes[i];
         var theta = Math.atan2(node.y - worldPos.y, node.x - worldPos.x);
         thetaArray.push({ theta: theta, index: i });
-        //console.log(thetaArray);
+        console.log(thetaArray);
       }
 
       //var idealAngle = 4 * Math.PI / (nodes.length);
@@ -34431,40 +34348,36 @@ function RadialRepulsionForce(alpha) {
 
       for (
         var i = 0,
-          n = thetaArray.length,
+          n = thetaArray.length-1,
           node1,
           node2,
-          k = 0.1 * Math.sqrt(alpha) * radialRepulsionSliderValue;
+          k = 0.2 * alpha * radialRepulsionSliderValue;
         i < n;
         i++
       ) {
-        for (var jj = i + 1; jj < i + 5; jj++) {
-          //var j = (i + 1) % n;
-          j = (jj + n) % n;
+        
+          var j = (i + 1) % n;
+          
 
           node1 = nodes[thetaArray[i].index];
           node2 = nodes[thetaArray[j].index];
 
           var node1Relative = {
             x: node1.x - worldPos.x,
-            y: node1.y - worldPos.y,
-            z: node1.z - worldPos.z
+            y: node1.y - worldPos.y
           };
           var node2Relative = {
             x: node2.x - worldPos.x,
-            y: node2.y - worldPos.y,
-            z: node2.z - worldPos.z
+            y: node2.y - worldPos.y
           };
 
           var modulusNode1 = Math.sqrt(
             node1Relative.x * node1Relative.x +
-              node1Relative.y * node1Relative.y +
-              node1Relative.z * node1Relative.z
+              node1Relative.y * node1Relative.y
           );
           var modulusNode2 = Math.sqrt(
             node2Relative.x * node2Relative.x +
-              node2Relative.y * node2Relative.y +
-              node2Relative.z * node2Relative.z
+              node2Relative.y * node2Relative.y 
           );
 
           //console.log(modulusNode1);
@@ -34472,15 +34385,14 @@ function RadialRepulsionForce(alpha) {
 
           
           //Initializing radial bounds for each node
-          var node1RadialBound = 5400 / modulusNode1;
-          var node2RadialBound = 5400 / modulusNode2;
+          var node1RadialBound = 100;
+          var node2RadialBound = 100;
           //console.log(node1RadialBound + "  "+ modulusNode1 +"  "+"radial bounds: " + node1RadialBound+ "  "+ modulusNode2);
 
           var angleBetweenNode1Node2Realtive = Math.abs(
             Math.acos(
               (node1Relative.x * node2Relative.x +
-                node1Relative.y * node2Relative.y +
-                node1Relative.z * node2Relative.z) /
+                node1Relative.y * node2Relative.y)/
                 (modulusNode1 * modulusNode2)
             )
           );
@@ -34494,205 +34406,44 @@ function RadialRepulsionForce(alpha) {
 
           var deltaTheta = angleBetweenNode1Node2Realtive - idealAngle;
 
-          //console.log(deltaTheta);
+          console.log(deltaTheta);
 
-          deltaZ = Math.abs(node1.z - node2.z);
-          idealDeltaZ = node1RadialBound + node2RadialBound;
 
-          if (deltaTheta < 0 && deltaZ < idealDeltaZ) {
+           
             var unitNode1 = {
               x: node1Relative.x / modulusNode1,
-              y: node1Relative.y / modulusNode1,
-              z: node1Relative.z / modulusNode1
+              y: node1Relative.y / modulusNode1
             };
             var unitNode2 = {
               x: node2Relative.x / modulusNode2,
-              y: node2Relative.y / modulusNode2,
-              z: node2Relative.z / modulusNode2
+              y: node2Relative.y / modulusNode2
             };
-
-            var dotProductNode1Node2 =
-              unitNode1.x * unitNode2.x +
-              unitNode1.y * unitNode2.y +
-              unitNode1.z * unitNode2.z;
-
-            var minMod = Math.min(modulusNode1, modulusNode2);
-
+           
             //Defining force for node1
             node1.vx -=
               k *
               deltaTheta *
-              (unitNode1.x * dotProductNode1Node2 - unitNode2.x);
+              (unitNode1.y);
             node1.vy -=
               k *
               deltaTheta *
-              (unitNode1.y * dotProductNode1Node2 - unitNode2.y);
-            node1.vz -=
-              k *
-              deltaTheta *
-              (unitNode1.z * dotProductNode1Node2 - unitNode2.z);
+              (-unitNode1.x);
+            
             //Defining force for node2
             node2.vx -=           
               k *
               deltaTheta *
-              (unitNode2.x * dotProductNode1Node2 - unitNode1.x);
+              (-unitNode2.y);
             node2.vy -=        
-              k *
+               k *
               deltaTheta *
-              (unitNode2.y * dotProductNode1Node2 - unitNode1.y);
-            node2.vz -=
-              k *
-              deltaTheta *
-              (unitNode2.z * dotProductNode1Node2 - unitNode1.z);
-          }
-        }
+              (unitNode2.x);
+    
+          
+        
       }
 
-      //Projecting onto y-z axis
-
-      worldPos.setFromMatrixPosition(cameraEl.object3D.matrixWorld);
-
-      //	console.log("user's position is" + worldPos.x);
-
-      //nodes[0].fixed=true;//nodes[0].x=0;//nodes[0].y=0;
-      //viewNode= nodes[nodes.length-1];
-      var thetaArray = [];
-
-      //Appending theta to thetaArray in radians (-pi,pi] corresponding to each node
-      for (var i = 0, n = nodes.length, node; i < n; i++) {
-        node = nodes[i];
-        var theta = Math.atan2(node.z - worldPos.z, node.y - worldPos.y);
-        thetaArray.push({ theta: theta, index: i });
-        //console.log(thetaArray);
-      }
-
-      //var idealAngle = 4 * Math.PI / (nodes.length);
-      //Sorting the angles
-      thetaArray.sort(function(a, b) {
-        return a.theta - b.theta;
-      });
-
-      //Force vector field mimicing radial replusion between consecutive pairs of angular-sorted nodes
-
-      for (
-        var i = 0,
-          n = thetaArray.length,
-          node1,
-          node2,
-          k = 0.1 * Math.sqrt(alpha) * radialRepulsionSliderValue;
-        i < n;
-        i++
-      ) {
-        for (var jj = i + 1; jj < i + 5; jj++) {
-          //var j = (i + 1) % n;
-          j = (jj + n) % n;
-
-          node1 = nodes[thetaArray[i].index];
-          node2 = nodes[thetaArray[j].index];
-
-          var node1Relative = {
-            x: node1.x - worldPos.x,
-            y: node1.y - worldPos.y,
-            z: node1.z - worldPos.z
-          };
-          var node2Relative = {
-            x: node2.x - worldPos.x,
-            y: node2.y - worldPos.y,
-            z: node2.z - worldPos.z
-          };
-
-          var modulusNode1 = Math.sqrt(
-            node1Relative.x * node1Relative.x +
-              node1Relative.y * node1Relative.y +
-              node1Relative.z * node1Relative.z
-          );
-          var modulusNode2 = Math.sqrt(
-            node2Relative.x * node2Relative.x +
-              node2Relative.y * node2Relative.y +
-              node2Relative.z * node2Relative.z
-          );
-
-          //console.log(modulusNode1);
-
-          //Initializing radial bounds for each node
-          var node1RadialBound = 5400 / modulusNode1;
-          var node2RadialBound = 5400 / modulusNode2;
-          //console.log(node1RadialBound + "  "+ modulusNode1 +"  "+"radial bounds: " + node1RadialBound+ "  "+ modulusNode2);
-
-          var angleBetweenNode1Node2Realtive = Math.abs(
-            Math.acos(
-              (node1Relative.x * node2Relative.x +
-                node1Relative.y * node2Relative.y +
-                node1Relative.z * node2Relative.z) /
-                (modulusNode1 * modulusNode2)
-            )
-          );
-
-          //Computing specific ideal angle
-          var paddingAngle = 0.2;
-          var idealAngle = paddingAngle +
-            Math.atan2(node1RadialBound, modulusNode1) +
-            Math.atan2(node2RadialBound, modulusNode2);
-         
-
-          var deltaTheta = angleBetweenNode1Node2Realtive - idealAngle;
-
-          //console.log(deltaTheta);
-
-          deltaX = Math.abs(node1.x - node2.x);
-          idealDeltaX = node1RadialBound + node2RadialBound;
-
-          if (deltaTheta < 0 && deltaX < idealDeltaX) {
-            var unitNode1 = {
-              x: node1Relative.x / modulusNode1,
-              y: node1Relative.y / modulusNode1,
-              z: node1Relative.z / modulusNode1
-            };
-            var unitNode2 = {
-              x: node2Relative.x / modulusNode2,
-              y: node2Relative.y / modulusNode2,
-              z: node2Relative.z / modulusNode2
-            };
-
-            var dotProductNode1Node2 =
-              unitNode1.x * unitNode2.x +
-              unitNode1.y * unitNode2.y +
-              unitNode1.z * unitNode2.z;
-
-            var minMod = Math.min(modulusNode1, modulusNode2);
-
-            //Defining force for node1
-            node1.vx -=
-              k * 
-              deltaTheta *
-              (unitNode1.x * dotProductNode1Node2 - unitNode2.x);
-            node1.vy -=
-              k *
-              deltaTheta *
-              (unitNode1.y * dotProductNode1Node2 - unitNode2.y);
-            node1.vz -=
-              k *
-              deltaTheta *
-              (unitNode1.z * dotProductNode1Node2 - unitNode2.z);
-            //Defining force for node2
-            node2.vx -=
-              
-              k *
-              deltaTheta *
-              (unitNode2.x * dotProductNode1Node2 - unitNode1.x);
-            node2.vy -=
-              
-              k *
-              deltaTheta *
-              (unitNode2.y * dotProductNode1Node2 - unitNode1.y);
-            node2.vz -=
-              
-              k *
-              deltaTheta *
-              (unitNode2.z * dotProductNode1Node2 - unitNode1.z);
-          }
-        }
-      }
+     
 
     }
   }
