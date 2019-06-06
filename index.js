@@ -34176,8 +34176,7 @@ var startComputationTime = 0,
   endComputationTime = 0;
 var linkStrengtSliderValue = 1;
 var radialRepulsionSliderValue = 1;
-var sphericalClusteringRadiusValue = 500;
-var sphericalClusteringStrengthValue = 1;
+
 var iterationCountValue = 0;
 var errorTextValue = "Calculating error..";
 var tickCount = 0;
@@ -34239,28 +34238,29 @@ linkStrengthSliderValue =
   document.getElementById("linkStrengthValue").value / 100;
 radialRepulsionSliderValue =
   document.getElementById("radialForceStrengthValue").value / 100;
-sphericalClusteringRadiusValue = document.getElementById(
-  "sphericalClusteringRadiusValue"
-).value;
-sphericalClusteringStrengthValue =
-  document.getElementById("sphericalClusteringStrengthValue").value / 100;
+
 tickCount = 0;
 
 startComputationTime = new Date().getTime();
 
-const Graph = ForceGraph3D()(document.getElementById("3d-graph"))
+var nodes = adata.nodes;
+const Graph = ForceGraph()(document.getElementById("3d-graph"))
   .graphData(adata)
   .d3Force("charge", null)
-  //.d3Force("Linear_Spring_force", LinearSpringForce)
   .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
-  .d3Force("Radial_Replusion_force", RadialRepulsionForce)
-  //.d3Force("Spherical_force", SphericalClusteringForce)
- // .d3Force("collision", d3.forceCollide(5).iterations(10))
-  //.linkVisibility(false)
+  .d3Force("Radial_Force",RadialRepulsionForce)
+  .linkLabel('distance')
+  .linkVisibility(false)
   .onEngineTick(ticked)
+  //.nodeColor(getNodeColor())
   ;
 //.nodeLabel('name')
-//.linkLabel('distance')
+
+
+
+function getNodeColor(){
+
+}
 // .onEngineStop(computeDistances)
 /*.nodeThreeObject(({ img }) => {
 const imgTexture = new THREE.TextureLoader().load(`./imgs/${img}`);
@@ -34275,7 +34275,7 @@ return sprite;
 function ticked() {
   tickCount++;
   //console.log(tickCount);
-   // computeDistances();
+   computeDistances();
   document.getElementById("iterationCountValue").textContent =
     "Iterations: " + tickCount;
 }
@@ -34291,8 +34291,7 @@ function computeDistances() {
     for (var j = i + 1; j < nodes.length-1; j++) {
       dist[j + i] = Math.sqrt(
         (nodes[i].x - nodes[j].x) * (nodes[i].x - nodes[j].x) +
-          (nodes[i].y - nodes[j].y) * (nodes[i].y - nodes[j].y) +
-          (nodes[i].z - nodes[j].z) * (nodes[i].z - nodes[j].z)
+          (nodes[i].y - nodes[j].y) * (nodes[i].y - nodes[j].y)
       );
       //console.log("original distance "+ i +j+ " "+data.links[i+j].distance);
       //console.log("actual distance "+ i +" "+ j+ " "+ dist[i+j]);
@@ -34316,17 +34315,6 @@ RadialRepulsionForce.initialize = function(_) {
 
 function RadialRepulsionForce(alpha) {
   if (radialRepulsionSliderValue > 0) {
-    for (var trials = 0; trials < 50; trials++) {
-      //console.log("alpha "+alpha)
-
-      //Projecting onto x-y axis
-
-      //worldPos.setFromMatrixPosition(cameraEl.object3D.matrixWorld);
-
-      //	console.log("user's position is" + worldPos.x);
-
-      //nodes[0].fixed=true;//nodes[0].x=0;//nodes[0].y=0;
-      //viewNode= nodes[nodes.length-1];
       worldPos= nodes[nodes.length-1];
       var thetaArray = [];
 
@@ -34348,16 +34336,14 @@ function RadialRepulsionForce(alpha) {
 
       for (
         var i = 0,
-          n = thetaArray.length-1,
+          n = thetaArray.length,
           node1,
           node2,
-          k = 0.2 * alpha * radialRepulsionSliderValue;
+          k = 1/10 * alpha * radialRepulsionSliderValue;
         i < n;
         i++
       ) {
-        
-          var j = (i + 1) % n;
-          
+          var j=(i+1)%(n);
 
           node1 = nodes[thetaArray[i].index];
           node2 = nodes[thetaArray[j].index];
@@ -34385,8 +34371,8 @@ function RadialRepulsionForce(alpha) {
 
           
           //Initializing radial bounds for each node
-          var node1RadialBound = 100;
-          var node2RadialBound = 100;
+          var node1RadialBound = 50;
+          var node2RadialBound = 50;
           //console.log(node1RadialBound + "  "+ modulusNode1 +"  "+"radial bounds: " + node1RadialBound+ "  "+ modulusNode2);
 
           var angleBetweenNode1Node2Realtive = Math.abs(
@@ -34398,87 +34384,61 @@ function RadialRepulsionForce(alpha) {
           );
 
           //Computing specific ideal angle
-          var paddingAngle = 0.2;
-          var idealAngle = paddingAngle +
+          var idealAngle = 
             Math.atan2(node1RadialBound, modulusNode1) +
             Math.atan2(node2RadialBound, modulusNode2);
     
 
-          var deltaTheta = angleBetweenNode1Node2Realtive - idealAngle;
+          var deltaTheta = angleBetweenNode1Node2Realtive - (idealAngle)*(1.15);
 
           console.log(deltaTheta);
 
 
            
-            var unitNode1 = {
-              x: node1Relative.x / modulusNode1,
-              y: node1Relative.y / modulusNode1
-            };
-            var unitNode2 = {
-              x: node2Relative.x / modulusNode2,
-              y: node2Relative.y / modulusNode2
-            };
+            var unitNode1 = {x: node1Relative.x * 100 / modulusNode1, y: node1Relative.y*100/ modulusNode1};
+            var unitNode2 = {x: node2Relative.x * 100/ modulusNode2, y: node2Relative.y *100/ modulusNode2};
            
-            //Defining force for node1
-            node1.vx -=
-              k *
-              deltaTheta *
-              (unitNode1.y);
-            node1.vy -=
-              k *
-              deltaTheta *
-              (-unitNode1.x);
-            
-            //Defining force for node2
-            node2.vx -=           
-              k *
-              deltaTheta *
-              (-unitNode2.y);
-            node2.vy -=        
-               k *
-              deltaTheta *
-              (unitNode2.x);
+
+            if (Math.abs(unitNode1.x -unitNode2.x) >= 10e-3  && Math.abs(unitNode1.y -unitNode2.y) >=10e-3){
+              if(deltaTheta<0){
+                //Defining force for node1
+                node1.vx -= 1 *k *deltaTheta *(unitNode1.y);
+                node1.vy -= 1 *k *deltaTheta *(-unitNode1.x);
+                //Defining force for node2
+                node2.vx -= 1 * k *deltaTheta *(-unitNode2.y);
+                node2.vy -= 1 * k *deltaTheta *(unitNode2.x);
+                }
     
+                else{
+                 //Defining force for node1
+                node1.vx -= 0.01 *k *deltaTheta *(unitNode1.y);
+                node1.vy -= 0.01 *k *deltaTheta *(-unitNode1.x);
+                //Defining force for node2
+                node2.vx -= 0.01 * k *deltaTheta *(-unitNode2.y);
+                node2.vy -= 0.01 * k *deltaTheta *(unitNode2.x);
+                }
+            }
+
+            else{
+
+              console.log("almost linear");
+              //Defining force for node1
+              node1.vx*=2
+              node1.vy *=2
+              //Defining force for node2
+              node2.vx *=2
+              node2.vy *=2
+
+            }
+            
+           
           
-        
+
+       
       }
 
      
 
-    }
-  }
-}
-
-//Defining the Sphere CLustering Force
-SphericalClusteringForce.initialize = function(_) {
-  nodes = _;
-};
-function SphericalClusteringForce(alpha) {
-  worldPos.setFromMatrixPosition(cameraEl.object3D.matrixWorld);
-  //console.log("user's position is " + worldPos.x + " "+worldPos.y + " "+ worldPos.z);
-  for (
-    var i = 0,
-      n = nodes.length,
-      k = alpha * sphericalClusteringStrengthValue,
-      node;
-    i < n;
-    ++i
-  ) {
-    node = nodes[i];
-    var nodeRelative = {
-      x: node.x - worldPos.x,
-      y: node.y - worldPos.y,
-      z: node.z - worldPos.z
-    };
-    var modulusNode = Math.sqrt(
-      nodeRelative.x * nodeRelative.x +
-        nodeRelative.y * nodeRelative.y +
-        nodeRelative.z * nodeRelative.z
-    );
-
-    var signn = Math.sign(sphericalClusteringRadiusValue - modulusNode);
-    node.vx += k * nodeRelative.x * signn;
-    node.vy += k * nodeRelative.y * signn;
-    node.vz += k * nodeRelative.z * signn;
+  
   }
 }
