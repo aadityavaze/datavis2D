@@ -34251,24 +34251,19 @@ const Graph = ForceGraph()(document.getElementById("3d-graph"))
   .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
   .d3Force("Radial_Force",RadialRepulsionForce)
   .linkLabel('distance')
-  .linkVisibility(false)
+  //.linkVisibility(false)
   .onEngineTick(ticked)
+  .linkWidth(2)
   .nodeColor(function(d){
     //console.log(d.id);
     if(d.id==(nodes.length-1+"")){return "#000000";}
     
     else{return "#00aacc";}})
-    .linkColor{
-      
-    }
+  .linkColor(function(d){return "#00ff00";})
+    
   ;
 //.nodeLabel('name')
 
-
-
-function getNodeColor(){
-  return 
-}
 // .onEngineStop(computeDistances)
 /*.nodeThreeObject(({ img }) => {
 const imgTexture = new THREE.TextureLoader().load(`./imgs/${img}`);
@@ -34283,37 +34278,54 @@ return sprite;
 function ticked() {
   tickCount++;
   //console.log(tickCount);
-   computeDistances();
+
   document.getElementById("iterationCountValue").textContent =
     "Iterations: " + tickCount;
-}
 
-//Computing final distances between nodes and error calculation
-function computeDistances() {
-  endComputationTime = new Date().getTime();
-  document.getElementById("computationTimeValue").textContent =
-    "Eff.Comp.Time: " + (endComputationTime - startComputationTime) + " ms";
-  var dist = [];
-  var errorSum = 0;
-  for (var i = 0; i < nodes.length-1; i++) {
-    for (var j = i + 1; j < nodes.length-1; j++) {
-      dist[j + i] = Math.sqrt(
-        (nodes[i].x - nodes[j].x) * (nodes[i].x - nodes[j].x) +
-          (nodes[i].y - nodes[j].y) * (nodes[i].y - nodes[j].y)
-      );
-      //console.log("original distance "+ i +j+ " "+data.links[i+j].distance);
-      //console.log("actual distance "+ i +" "+ j+ " "+ dist[i+j]);
 
-      errorSum +=
-        Math.abs(dist[i + j] - data.links[i + j].distance) /
-        data.links[i + j].distance;
+
+  //Computation time calculation
+    endComputationTime = new Date().getTime();
+    document.getElementById("computationTimeValue").textContent =
+      "Eff.Comp.Time: " + (endComputationTime - startComputationTime) + " ms";
+
+
+
+    
+
+  //Restyling links color
+  var distanceError=0;
+  var updatedLinkColorMap =  new Map();
+  var thresholdLinkError = 2;
+  for(var i=0; i<links.length; i++){
+
+    var idealDistance = links[i].distance;
+    var currentDistance = Math.sqrt((links[i].source.x-links[i].target.x)*(links[i].source.x-links[i].target.x)+
+    (links[i].source.y-links[i].target.y)*(links[i].source.y-links[i].target.y));  
+
+    var linkDistanceError = (Math.abs(idealDistance-currentDistance)/idealDistance);
+    //console.log(linkDistanceError);
+    if(linkDistanceError>= thresholdLinkError){
+      updatedLinkColorMap.set(links[i].index,"#ff0000");
+      console.log("bad link");
     }
-  }
+    else{
+      updatedLinkColorMap.set(links[i].index,"#00ff00");
+      console.log("good link");
+    }
+    distanceError+=Math.abs(idealDistance-currentDistance)/idealDistance;
 
-  document.getElementById("errorValue").textContent =
-    "Relative Mean Error: " + errorSum / data.links.length;
-  //console.log("distance error " + errorSum / data.links.length);
+  }
+  distanceError/=links.length;
+
+  document.getElementById("errorValue").textContent = "Relative Mean Error: " + distanceError;
+  //console.log(updatedLinkColorMap);
+  Graph.linkColor(function(d){
+    return updatedLinkColorMap.get(d.index);});
+
 }
+
+
 
 var worldPos;
 //Defining the Rdial Repulsion Force
@@ -34450,3 +34462,28 @@ function RadialRepulsionForce(alpha) {
   
   }
 }
+
+
+var rangeSlider = function() {
+  var slider = $(".range-slider"),
+    range = $(".range-slider__range"),
+    value = $(".range-slider__value");
+
+  slider.each(function() {
+    value.each(function() {
+      var value = $(this)
+        .prev()
+        .attr("value");
+      $(this).html(value);
+    });
+
+    range.on("input", function() {
+      $(this)
+        .next(value)
+        .html(this.value);
+    });
+  });
+};
+
+rangeSlider();
+
