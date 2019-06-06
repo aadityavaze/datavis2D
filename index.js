@@ -34273,8 +34273,8 @@ var bdata = {
     { source: "9", target: "10", distance: "70" }
   ]
 };
-var nodes = bdata.nodes;
-var links = bdata.links;
+var nodes = adata.nodes;
+var links = adata.links;
 //First-time Initializing graph
 
 linkStrengthSliderValue =
@@ -34338,7 +34338,7 @@ function ticked() {
   //Restyling links color
   var distanceError=0;
   var updatedLinkColorMap =  new Map();
-  var thresholdLinkError = 2;
+  var thresholdLinkError = 3;
   for(var i=0; i<links.length; i++){
 
     var idealDistance = links[i].distance;
@@ -34531,9 +34531,7 @@ var rangeSlider = function() {
 
         console.log("lambda" + linkStrengthSliderValue);
         console.log("lambda" +radialRepulsionSliderValue);
-        Graph.graphData({nodes, links})
-        .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
-        .d3Force("Radial_Force",RadialRepulsionForce);
+        StartSimulation();
       
     });
   });
@@ -34541,3 +34539,37 @@ var rangeSlider = function() {
 
 rangeSlider();
 
+document.getElementById('graphDataSelector').addEventListener('change', function(e) {
+  //console.log("apple" + e.target.value);
+  switch(e.target.value){
+    case "d0":
+        nodes = adata.nodes;
+        links = adata.links;
+        break;
+
+    case "d1":
+        nodes = bdata.nodes;
+        links = bdata.links;
+        break;
+
+    case "d2":
+        nodes = data.nodes;
+        links = data.links;
+        break;
+
+  }
+
+  Graph.graphData({nodes, links})
+  .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
+  .d3Force("Radial_Force",RadialRepulsionForce);
+
+
+}, false);
+
+
+function StartSimulation(){
+  startComputationTime = new Date().getTime();
+  Graph.graphData({nodes, links})
+  .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
+  .d3Force("Radial_Force",RadialRepulsionForce);
+}
