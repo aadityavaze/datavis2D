@@ -5486,7 +5486,7 @@ var data = {
     { id: "237", name: "South Africa" },
     { id: "238", name: "Zambia" },
     { id: "239", name: "Zimbabwe" },
-    { id: "240xs", name: "Viewer" }
+    { id: "240", name: "Viewer" }
   ],
   links: [
     { source: "0", target: "1", distance: "253.27012292239587" },
@@ -34231,7 +34231,8 @@ var adata = {
   ]
 };
 
-
+var nodes = adata.nodes;
+var links = adata.links;
 //First-time Initializing graph
 
 linkStrengthSliderValue =
@@ -34243,23 +34244,30 @@ tickCount = 0;
 
 startComputationTime = new Date().getTime();
 
-var nodes = adata.nodes;
+
 const Graph = ForceGraph()(document.getElementById("3d-graph"))
-  .graphData(adata)
+  .graphData({nodes, links})
   .d3Force("charge", null)
   .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
   .d3Force("Radial_Force",RadialRepulsionForce)
   .linkLabel('distance')
   .linkVisibility(false)
   .onEngineTick(ticked)
-  //.nodeColor(getNodeColor())
+  .nodeColor(function(d){
+    //console.log(d.id);
+    if(d.id==(nodes.length-1+"")){return "#000000";}
+    
+    else{return "#00aacc";}})
+    .linkColor{
+      
+    }
   ;
 //.nodeLabel('name')
 
 
 
 function getNodeColor(){
-
+  return 
 }
 // .onEngineStop(computeDistances)
 /*.nodeThreeObject(({ img }) => {
@@ -34399,7 +34407,7 @@ function RadialRepulsionForce(alpha) {
             var unitNode2 = {x: node2Relative.x * 100/ modulusNode2, y: node2Relative.y *100/ modulusNode2};
            
 
-            if (Math.abs(unitNode1.x -unitNode2.x) >= 10e-3  && Math.abs(unitNode1.y -unitNode2.y) >=10e-3){
+            if (Math.abs(unitNode1.x -unitNode2.x) >= 10e-4  && Math.abs(unitNode1.y -unitNode2.y) >=10e-4){
               if(deltaTheta<0){
                 //Defining force for node1
                 node1.vx -= 1 *k *deltaTheta *(unitNode1.y);
