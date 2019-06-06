@@ -34231,8 +34231,50 @@ var adata = {
   ]
 };
 
-var nodes = adata.nodes;
-var links = adata.links;
+
+var bdata = {
+  nodes: [
+    { id: "0", name: "0" },
+    { id: "1", name: "1" },
+    { id: "2", name: "2" },
+    { id: "3", name: "3" },
+    { id: "4", name: "4" },
+    { id: "5", name: "5" },
+    { id: "6", name: "6" },
+    { id: "7", name: "7" },
+    { id: "8", name: "8" },
+    { id: "9", name: "9" },
+    { id: "10", name: "10" },
+    { id: "11", name: "11" },
+    { id: "12", name: "12" },
+    { id: "13", name: "Viewer" }
+  ],
+
+  links: [
+    { source: "0", target: "1", distance: "20" },
+    { source: "1", target: "2", distance: "10" },
+    { source: "1", target: "3", distance: "20" },
+    { source: "1", target: "4", distance: "30" },
+    { source: "1", target: "5", distance: "40" },
+    { source: "2", target: "3", distance: "50" },
+    { source: "2", target: "4", distance: "60" },
+    { source: "2", target: "5", distance: "30" },
+    { source: "3", target: "4", distance: "30" },
+    { source: "3", target: "5", distance: "40" },
+    { source: "4", target: "5", distance: "10" },
+    { source: "4", target: "6", distance: "20" },
+    { source: "2", target: "6", distance: "70" },
+    { source: "12", target: "4", distance: "60" },
+    { source: "11", target: "5", distance: "30" },
+    { source: "9", target: "4", distance: "30" },
+    { source: "8", target: "5", distance: "40" },
+    { source: "7", target: "5", distance: "10" },
+    { source: "12", target: "11", distance: "20" },
+    { source: "9", target: "10", distance: "70" }
+  ]
+};
+var nodes = bdata.nodes;
+var links = bdata.links;
 //First-time Initializing graph
 
 linkStrengthSliderValue =
@@ -34258,7 +34300,7 @@ const Graph = ForceGraph()(document.getElementById("3d-graph"))
     //console.log(d.id);
     if(d.id==(nodes.length-1+"")){return "#000000";}
     
-    else{return "#00aacc";}})
+    else{return "#999999";}})
   .linkColor(function(d){return "#00ff00";})
     
   ;
@@ -34481,6 +34523,18 @@ var rangeSlider = function() {
       $(this)
         .next(value)
         .html(this.value);
+
+        linkStrengthSliderValue =
+        document.getElementById("linkStrengthValue").value / 100;
+        radialRepulsionSliderValue =
+        document.getElementById("radialForceStrengthValue").value / 100;
+
+        console.log("lambda" + linkStrengthSliderValue);
+        console.log("lambda" +radialRepulsionSliderValue);
+        Graph.graphData({nodes, links})
+        .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
+        .d3Force("Radial_Force",RadialRepulsionForce);
+      
     });
   });
 };
