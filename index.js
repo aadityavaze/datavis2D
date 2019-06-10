@@ -34273,6 +34273,48 @@ var bdata = {
     { source: "9", target: "10", distance: "70" }
   ]
 };
+
+var cdata = {
+  nodes: [
+    { id: "0", name: "Mumbai" },
+    { id: "1", name: "Delhi" },
+    { id: "2", name: "Kolkata" },
+    { id: "3", name: "Chennai" },
+    { id: "4", name: "Ahmedabad" },
+    { id: "5", name: "Vadodara" },
+    { id: "6", name: "Pune" },
+    { id: "7", name: "Hyderabad" },
+    { id: "8", name: "Bangalore" },
+    { id: "9", name: "Bhopal" },
+    { id: "10", name: "Indore" },
+    { id: "11", name: "Shimla" },
+    { id: "12", name: "Chandigarh" },
+    { id: "13", name: "Kochi" },
+    { id: "14", name: "Viewer" }
+  ],
+
+  links: [
+    { source: "0", target: "1", distance: "115" },
+    { source: "8", target: "2", distance: "154" },
+    { source: "3", target: "7", distance: "50" },
+    { source: "0", target: "8", distance: "84" },
+    { source: "4", target: "5", distance: "11" },
+    { source: "4", target: "8", distance: "140" },
+    { source: "1", target: "2", distance: "221" },
+    { source: "7", target: "6", distance: "56" },
+    { source: "0", target: "6", distance: "15" },
+    { source: "13", target: "12", distance: "297" },
+    { source: "12", target: "11", distance: "11" },
+    { source: "10", target: "11", distance: "116" },
+    { source: "12", target: "9", distance: "101" },
+    { source: "6", target: "11", distance: "178" },
+    { source: "6", target: "10", distance: "59" },
+    { source: "10", target: "5", distance: "33" },
+    { source: "4", target: "9", distance: "58" },
+    { source: "3", target: "13", distance: "69" },
+    { source: "8", target: "12", distance: "241" }
+  ]
+};
 var nodes = adata.nodes;
 var links = adata.links;
 //First-time Initializing graph
@@ -34290,10 +34332,10 @@ startComputationTime = new Date().getTime();
 const Graph = ForceGraph()(document.getElementById("3d-graph"))
   .graphData({nodes, links})
   .d3Force("charge", null)
-  .d3Force("link",d3.forceLink().distance(d => d.distance).strength(linkStrengthSliderValue))
+  .d3Force("link",d3.forceLink().distance(d => d.distance).strength(Math.sqrt(linkStrengthSliderValue)))
   .d3Force("Radial_Force",RadialRepulsionForce)
+  .d3Force("collision", d3.forceCollide().radius(4))
   .linkLabel('distance')
-  //.linkVisibility(false)
   .onEngineTick(ticked)
   .linkWidth(2)
   .nodeColor(function(d){
@@ -34338,7 +34380,7 @@ function ticked() {
   //Restyling links color
   var distanceError=0;
   var updatedLinkColorMap =  new Map();
-  var thresholdLinkError = 3;
+  var thresholdLinkError = 0.2;
   for(var i=0; i<links.length; i++){
 
     var idealDistance = links[i].distance;
@@ -34385,7 +34427,7 @@ function RadialRepulsionForce(alpha) {
         node = nodes[i];
         var theta = Math.atan2(node.y - worldPos.y, node.x - worldPos.x);
         thetaArray.push({ theta: theta, index: i });
-        console.log(thetaArray);
+        //console.log(thetaArray);
       }
 
       //var idealAngle = 4 * Math.PI / (nodes.length);
@@ -34433,8 +34475,8 @@ function RadialRepulsionForce(alpha) {
 
           
           //Initializing radial bounds for each node
-          var node1RadialBound = 50;
-          var node2RadialBound = 50;
+          var node1RadialBound = 40;
+          var node2RadialBound = 40;
           //console.log(node1RadialBound + "  "+ modulusNode1 +"  "+"radial bounds: " + node1RadialBound+ "  "+ modulusNode2);
 
           var angleBetweenNode1Node2Realtive = Math.abs(
@@ -34473,11 +34515,11 @@ function RadialRepulsionForce(alpha) {
     
                 else{
                  //Defining force for node1
-                node1.vx -= 0.01 *k *deltaTheta *(unitNode1.y);
-                node1.vy -= 0.01 *k *deltaTheta *(-unitNode1.x);
+                node1.vx -= 0.001 *k *deltaTheta *(unitNode1.y);
+                node1.vy -= 0.001 *k *deltaTheta *(-unitNode1.x);
                 //Defining force for node2
-                node2.vx -= 0.01 * k *deltaTheta *(-unitNode2.y);
-                node2.vy -= 0.01 * k *deltaTheta *(unitNode2.x);
+                node2.vx -= 0.001 * k *deltaTheta *(-unitNode2.y);
+                node2.vy -= 0.001 * k *deltaTheta *(unitNode2.x);
                 }
             }
 
@@ -34553,8 +34595,8 @@ document.getElementById('graphDataSelector').addEventListener('change', function
         break;
 
     case "d2":
-        nodes = data.nodes;
-        links = data.links;
+        nodes = cdata.nodes;
+        links = cdata.links;
         break;
 
   }

@@ -30,7 +30,9 @@ body {
   color: #000;
   font-size: 12px;
 }
-
+.dataset-selector{
+  text-align: left;
+}
 
 #graphDataSelector{
   font-size: 12px;
